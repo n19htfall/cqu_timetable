@@ -33,7 +33,7 @@ def load_timetable(path="课表.xlsx") -> Timetable:
 
 
 def menu() -> str:
-    print(f"\033[93mCQU Timetable {datetime.now().strftime("%Y-%m-%d")}\033[0m")
+    print(f"\033[93mCQU Timetable " + datetime.now().strftime("%Y-%m-%d") + "\033[0m")
     print("1. 浏览课表")
     print("2. 最近的课")
     print("3. 今天的课")
