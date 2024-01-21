@@ -56,6 +56,7 @@ def load_timetable(path="课表.xlsx") -> Timetable:
 
 
 def menu() -> str:
+    print(f"\033[93m{datetime.now().strftime("%Y-%m-%d")}\033[0m")
     print(f"\033[93m{random.choice(tips)}\033[0m")
     print("1. 浏览课表")
     print("2. 下一节课")
@@ -71,8 +72,7 @@ def menu() -> str:
 def browse() -> None:
     os.system("cls" if os.name == "nt" else "clear")
     now = datetime.now()
-    string = now.strftime("%Y-%m-%d")
-    tt.find_one_day(string)
+    tt.find_one_day(now.strftime("%Y-%m-%d"))
     while True:
         print("\033[93m-------------------------------------\033[0m")
         print("\033[93m浏览课表🚩\033[0m")
