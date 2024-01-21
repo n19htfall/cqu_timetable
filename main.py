@@ -33,7 +33,7 @@ def load_timetable(path="课表.xlsx") -> Timetable:
 
 
 def menu() -> str:
-    print(f"\033[93m{datetime.now().strftime("%Y-%m-%d")}\033[0m")
+    print(f"\033[93mCQU Timetable {datetime.now().strftime("%Y-%m-%d")}\033[0m")
     print("1. 浏览课表")
     print("2. 下一节课")
     print("3. 今天的课")
@@ -107,6 +107,8 @@ if __name__ == "__main__":
                 tt.tomorrow()
             elif menu_choice == "5":
                 tt.find_one_day(input(f"请输入日期: "))
+            else:
+                print("\033[31m输入错误!\033[0m")
             if need_confirm:
                 _ = input("输入任意继续...")
             os.system("cls" if os.name == "nt" else "clear")
