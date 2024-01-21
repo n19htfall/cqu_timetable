@@ -84,7 +84,7 @@ class Course:
     def view(self, time: bool = True, week: bool = True, day: bool = True) -> None:
         print("课程名：", self.name)
         print("教师：", self.teacher)
-        print("课程号：", self.number)
+        print("教学班号：", self.number)
         print("地点：", self.place)
         if not self.is_all_week and time:
             print("开始时间：", self.start.strftime("%H:%M"))

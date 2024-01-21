@@ -168,9 +168,3 @@ class Timetable:
                 with open("config.ini", "w") as configfile:
                     config.write(configfile)
                 return True
-
-# if __name__ == "__main__":
-#     timetable = Timetable("课表.xlsx")
-#     for course in timetable.courses:
-#         course.view()
-#         print()
