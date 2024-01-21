@@ -174,6 +174,7 @@ class Timetable:
                 with open("config.ini", "w") as configfile:
                     config.write(configfile)
                 return True
+        return False
 
     def export_ics(self):
         with open("CQUTimetable.ics", "wb") as f:
