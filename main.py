@@ -1,8 +1,8 @@
-from timetable import Timetable, re
-from course import datetime, timedelta
-
 import os
 import sys
+
+from course import datetime, timedelta
+from timetable import Timetable, re
 
 
 def init() -> Timetable:

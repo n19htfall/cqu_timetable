@@ -1,17 +1,20 @@
+import pandas as pd
+import re
+import warnings
+import shutil
+
 from course import Course
 from course import configparser
 from course import datetime, timedelta
 from icalendar import Calendar
-
-import pandas as pd
-import re
-import warnings
+from urllib.parse import quote
 
 config = configparser.ConfigParser()
 config.read("config.ini")
 date_str = config["database"]["weekone"]
 semester_start = datetime.strptime(date_str, "%Y-%m-%d")
 semester_end = semester_start + timedelta(weeks=21)
+
 
 class Timetable:
     def __init__(self, path: str) -> None:
@@ -158,7 +161,7 @@ class Timetable:
             print("\033[93m-------------------------------------\033[0m")
         else:
             print("\033[93m今明两天都没有课, 好好休息吧!\033[0m")
-    
+
     def detect_end(self, now):
         if now > semester_end:
             print("检测到有可能是新学期，是否更新学期开始时间？[Y/n]")
@@ -172,5 +175,11 @@ class Timetable:
                 return True
 
     def export_ics(self):
-        with open('CQUTimetable.ics', 'wb') as f:
+        with open("CQUTimetable.ics", "wb") as f:
             f.write(self.cal.to_ical())
+        shutil.copy("CQUTimetable.ics", "Event.txt")
+        with open("Event.txt", "r", encoding="utf-8") as f:
+            content = f.read()
+        encoded_content = quote(content)
+        with open("url.txt", "w", encoding="utf-8") as f:
+            f.write("data:text/calendar," + encoded_content)

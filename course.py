@@ -1,7 +1,8 @@
+import configparser
+
 from datetime import datetime, timedelta
 from icalendar import Calendar, Event
 
-import configparser
 
 config = configparser.ConfigParser()
 config.read("config.ini")
