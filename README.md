@@ -1,6 +1,6 @@
-# cqu_timetable
+# CQU Timetable
 
-Python实现的命令行查询课表，自用小玩具。可以浏览课表和导出ics文件至日历。
+Python实现的命令行查询CQU课表，自用小玩具。可以浏览课表和导出ics文件至日历。
 
 ## 效果
 
