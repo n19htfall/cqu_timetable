@@ -6,11 +6,11 @@ python实现的命令行查询课表，自用小玩具。可以浏览课表和�
 
 ### 命令行
 
-<img src="assets/example.png" alt="img1" style="zoom: 67%;" />
+<img src="./assets/example.png" alt="img1" style="zoom: 67%;" />
 
 ### 导入日历（以iOS为例）
 
-<img src="assets/example2.jpg" alt="img2" style="zoom:50%;" />
+<img src="./assets/example2.jpg" alt="img2" style="zoom:50%;" />
 
 ## 使用方法
 
