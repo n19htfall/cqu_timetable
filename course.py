@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
+from icalendar import Calendar, Event
 
 import configparser
 
 config = configparser.ConfigParser()
 config.read("config.ini")
-
+date_str = config["database"]["weekone"]
+semester_start = datetime.strptime(date_str, "%Y-%m-%d")
 
 class Course:
     def __init__(
@@ -94,3 +96,15 @@ class Course:
         if not self.is_all_week and day:
             print("星期", self.weekday + 1)
             print("第", self.class_range, "节")
+            
+    def create_event_in_ical(self, ical: Calendar):
+        if not self.is_all_week:
+            for week_num in self.week_range:
+                event = Event()
+                start_time = semester_start + timedelta(weeks=week_num-1, days=self.weekday) + timedelta(hours=self.start.hour, minutes=self.start.minute)
+                end_time = semester_start + timedelta(weeks=week_num-1, days=self.weekday) + timedelta(hours=self.end.hour, minutes=self.end.minute)
+                event.add('summary', self.name)
+                event.add('dtstart', start_time)
+                event.add('dtend', end_time)
+                event.add('location', self.place)
+                ical.add_component(event)

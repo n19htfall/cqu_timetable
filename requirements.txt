@@ -1,2 +1,3 @@
 pandas >= 1.5.3
 openpyxl >= 2.6.0
+icalendar == 5.0.11

@@ -1,6 +1,7 @@
 from course import Course
 from course import configparser
 from course import datetime, timedelta
+from icalendar import Calendar
 
 import pandas as pd
 import re
@@ -12,10 +13,10 @@ date_str = config["database"]["weekone"]
 semester_start = datetime.strptime(date_str, "%Y-%m-%d")
 semester_end = semester_start + timedelta(weeks=21)
 
-
 class Timetable:
     def __init__(self, path: str) -> None:
         self.courses: list[Course] = []
+        self.cal = Calendar()
         timetable_file = path
         try:
             with open(timetable_file):
@@ -37,6 +38,7 @@ class Timetable:
                 continue
             lst = [str(item) if isinstance(item, str) else "" for item in row]
             this_course = Course(lst[0], lst[1], lst[2], lst[3], lst[4])
+            this_course.create_event_in_ical(self.cal)
             self.courses += [this_course]
 
     def course_in_week(self, week: int) -> list[Course]:
@@ -168,3 +170,7 @@ class Timetable:
                 with open("config.ini", "w") as configfile:
                     config.write(configfile)
                 return True
+
+    def export_ics(self):
+        with open('CQUTimetable.ics', 'wb') as f:
+            f.write(self.cal.to_ical())

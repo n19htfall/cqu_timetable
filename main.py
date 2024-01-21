@@ -39,6 +39,7 @@ def menu() -> str:
     print("3. 今天的课")
     print("4. 明天的课")
     print("5. 查询某天的课")
+    print("6. 导出ics文件")
     print("q. 退出")
     print("\033[93m-------------------------------------\033[0m")
     choice = input("请输入：")
@@ -107,6 +108,9 @@ if __name__ == "__main__":
                 tt.tomorrow()
             elif menu_choice == "5":
                 tt.find_one_day(input(f"请输入日期: "))
+            elif menu_choice == "6":
+                tt.export_ics()
+                print("\033[93m导出成功!\033[0m")
             else:
                 print("\033[31m输入错误!\033[0m")
             if need_confirm:
