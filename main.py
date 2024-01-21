@@ -4,7 +4,6 @@ from course import datetime, timedelta
 import os
 import random
 import sys
-import os
 
 tips = [
     "CQU Timetable",
@@ -120,10 +119,10 @@ if __name__ == "__main__":
     try:
         menu_choice = menu()
         while menu_choice != "q" and menu_choice != "quit":
-            is_confirm = True
+            need_confirm = True
             if menu_choice == "1":
                 browse()
-                is_confirm = False
+                need_confirm = False
             elif menu_choice == "2":
                 tt.next_class()
             elif menu_choice == "3":
@@ -132,16 +131,9 @@ if __name__ == "__main__":
                 tt.tomorrow()
             elif menu_choice == "5":
                 tt.find_one_day(input(f"请输入日期: "))
-            else:
-                os.system("cls" if os.name == "nt" else "clear")
-                menu_choice = menu()
-                continue
-            if is_confirm:
-                _ = input("按任意键继续...")
-                print()
+            if need_confirm:
+                _ = input("输入任意继续...")
             os.system("cls" if os.name == "nt" else "clear")
             menu_choice = menu()
-        os.system("cls" if os.name == "nt" else "clear")
     except KeyboardInterrupt:
-        os.system("cls" if os.name == "nt" else "clear")
         sys.exit()

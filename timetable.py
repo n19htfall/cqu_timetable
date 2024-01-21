@@ -4,6 +4,7 @@ from course import datetime, timedelta
 
 import pandas as pd
 import re
+import warnings
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -22,7 +23,9 @@ class Timetable:
         except FileNotFoundError:
             print("\033[31m课表文件不存在!\033[0m")
             return
-        df = pd.read_excel(timetable_file, engine="openpyxl")
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            df = pd.read_excel(timetable_file, engine="openpyxl")
         rows_as_lists = []
         for _, row in df.iterrows():
             row_list = list(row)
