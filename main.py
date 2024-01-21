@@ -2,29 +2,7 @@ from timetable import Timetable, re
 from course import datetime, timedelta
 
 import os
-import random
 import sys
-
-tips = [
-    "CQU Timetable",
-    "喝杯咖啡吧~☕",
-    "休息休息💤",
-    "这显然是一个看课表的",
-    "在黑暗的时代，群星是否也应熄灭？",
-    "未来教会你独处",
-    "时间在这里汹涌地流逝",
-    "只是一种脆弱的感官把戏",
-]
-
-tips_week = [
-    "周一周一，我的头七",
-    "周二周二，命剩一半",
-    "周三周三，续命上班",
-    "周四周四，重见天日",
-    "周五周五，敲锣打鼓",
-    "周六周六，大鱼大肉",
-    "周日周日，死期将至",
-]
 
 
 def init() -> Timetable:
@@ -35,7 +13,6 @@ def init() -> Timetable:
     if tt.detect_end(datetime.now()):
         os.system("cls" if os.name == "nt" else "clear")
         os.system("python main.py")
-    tips.append(tips_week[datetime.now().weekday()])
     return tt
 
 
@@ -57,7 +34,6 @@ def load_timetable(path="课表.xlsx") -> Timetable:
 
 def menu() -> str:
     print(f"\033[93m{datetime.now().strftime("%Y-%m-%d")}\033[0m")
-    print(f"\033[93m{random.choice(tips)}\033[0m")
     print("1. 浏览课表")
     print("2. 下一节课")
     print("3. 今天的课")
