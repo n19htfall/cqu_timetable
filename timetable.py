@@ -12,9 +12,8 @@ from urllib.parse import quote
 
 config = configparser.ConfigParser()
 config.read("config.ini")
-date_str = config["database"]["weekone"]
-semester_start = datetime.strptime(date_str, "%Y-%m-%d")
-semester_end = semester_start + timedelta(weeks=21)
+SEMESTER_START = datetime.strptime(config["database"]["weekone"], "%Y-%m-%d")
+SEMESTER_END = SEMESTER_START + timedelta(weeks=20)
 
 
 class Timetable:
@@ -31,6 +30,9 @@ class Timetable:
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
             df = pd.read_excel(timetable_file, engine="openpyxl")
+        if self.detect_end(datetime.now()):
+            os.system("cls" if os.name == "nt" else "clear")
+            os.system("python main.py")
         rows_as_lists = []
         for _, row in df.iterrows():
             row_list = list(row)
@@ -42,7 +44,7 @@ class Timetable:
                 continue
             lst = [str(item) if isinstance(item, str) else "" for item in row]
             this_course = Course(lst[0], lst[1], lst[2], lst[3], lst[4])
-            this_course.create_event_in_ical(self.cal)
+            this_course.create_event_in_ical(self.cal, SEMESTER_START)
             self.courses += [this_course]
 
     def course_in_week(self, week: int) -> list[Course]:
@@ -74,11 +76,11 @@ class Timetable:
                     print("\033[31m格式错误!\033[0m")
                     return
             date = datetime(year, month, day)
-            if date > semester_end or date < semester_start:
+            if date > SEMESTER_END or date < SEMESTER_START:
                 print(f"\033[93m{year}年{month}月{day}日的课表🚀\033[0m")
                 print("这一天不在这学期!")
                 return
-            this_delta = date - semester_start
+            this_delta = date - SEMESTER_START
             this_week = this_delta.days // 7 + 1
             this_weekday = date.weekday()
             course_list = self.course_in_day(this_week, this_weekday)
@@ -118,7 +120,7 @@ class Timetable:
 
     def next_class(self, date: datetime = datetime.now()) -> None:
         current_date = datetime.now()
-        delta = current_date - semester_start
+        delta = current_date - SEMESTER_START
         current_week = delta.days // 7 + 1
         current_weekday = current_date.weekday()
         today_class = self.course_in_day(current_week, current_weekday)
@@ -164,16 +166,28 @@ class Timetable:
             print("\033[93m今明两天都没有课, 好好休息吧!\033[0m")
 
     def detect_end(self, now):
-        if now > semester_end:
-            print("检测到有可能是新学期，是否更新学期开始时间？[Y/n]")
+        if now > SEMESTER_END or SEMESTER_START.weekday() != 0:
+            print("检测到学期开始时间异常，是否更新学期开始时间？[Y/n]")
             choice = input()
             if choice == "Y" or choice == "y":
-                print("请输入新学期开始时间（格式：2024-02-26）：")
+                print("请输入学期第一周的周一日期（格式：2024-02-26）：")
                 date_str = input()
+                try:
+                    new_day = datetime.strptime(date_str, "%Y-%m-%d")
+                except ValueError:
+                    print("日期格式错误！")
+                    self.detect_end(now)
+                if new_day.weekday() != 0:
+                    print("输入的日期不是周一！")
+                    self.detect_end(now)
                 config.set("database", "weekone", date_str)
                 with open("config.ini", "w") as configfile:
                     config.write(configfile)
                 return True
+            elif choice == "N" or choice == "n":
+                return False
+            else:
+                self.detect_end(now)
         return False
 
     def export_ics(self):

@@ -6,8 +6,6 @@ from icalendar import Calendar, Event
 
 config = configparser.ConfigParser()
 config.read("config.ini")
-date_str = config["database"]["weekone"]
-semester_start = datetime.strptime(date_str, "%Y-%m-%d")
 
 class Course:
     def __init__(
@@ -98,7 +96,7 @@ class Course:
             print("星期", self.weekday + 1)
             print("第", self.class_range, "节")
             
-    def create_event_in_ical(self, ical: Calendar):
+    def create_event_in_ical(self, ical: Calendar, semester_start: datetime):
         if not self.is_all_week:
             for week_num in self.week_range:
                 event = Event()

@@ -10,9 +10,6 @@ def init() -> Timetable:
     if tt.courses == []:
         print("\033[31m课表为空! 请确认课表配置。\033[0m")
         sys.exit()
-    if tt.detect_end(datetime.now()):
-        os.system("cls" if os.name == "nt" else "clear")
-        os.system("python main.py")
     return tt
 
 
