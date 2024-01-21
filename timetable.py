@@ -2,6 +2,7 @@ import pandas as pd
 import re
 import warnings
 import shutil
+import os
 
 from course import Course
 from course import configparser
@@ -183,3 +184,7 @@ class Timetable:
         encoded_content = quote(content)
         with open("url.txt", "w", encoding="utf-8") as f:
             f.write("data:text/calendar," + encoded_content)
+        try:
+            os.remove("Event.txt")
+        except OSError as e:
+            print(f'删除文件时出错: {e}')
