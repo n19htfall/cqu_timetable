@@ -7,6 +7,7 @@ from icalendar import Calendar, Event
 config = configparser.ConfigParser()
 config.read("config.ini")
 
+
 class Course:
     def __init__(
         self, _name: str, _number: str, _time: str, _place: str = "", _teacher: str = ""
@@ -82,28 +83,22 @@ class Course:
                     lst += [int(end) if end.isdigit() else None]
         return lst
 
-    def view(self, time: bool = True, week: bool = True, day: bool = True) -> None:
-        print("课程名：", self.name)
-        print("教师：", self.teacher)
-        print("教学班号：", self.number)
-        print("地点：", self.place)
-        if not self.is_all_week and time:
-            print("开始时间：", self.start.strftime("%H:%M"))
-            print("结束时间：", self.end.strftime("%H:%M"))
-        if week:
-            print("周数：", self.week_range)
-        if not self.is_all_week and day:
-            print("星期", self.weekday + 1)
-            print("第", self.class_range, "节")
-            
     def create_event_in_ical(self, ical: Calendar, semester_start: datetime):
         if not self.is_all_week:
             for week_num in self.week_range:
                 event = Event()
-                start_time = semester_start + timedelta(weeks=week_num-1, days=self.weekday) + timedelta(hours=self.start.hour, minutes=self.start.minute)
-                end_time = semester_start + timedelta(weeks=week_num-1, days=self.weekday) + timedelta(hours=self.end.hour, minutes=self.end.minute)
-                event.add('summary', self.name)
-                event.add('dtstart', start_time)
-                event.add('dtend', end_time)
-                event.add('location', self.place)
+                start_time = (
+                    semester_start
+                    + timedelta(weeks=week_num - 1, days=self.weekday)
+                    + timedelta(hours=self.start.hour, minutes=self.start.minute)
+                )
+                end_time = (
+                    semester_start
+                    + timedelta(weeks=week_num - 1, days=self.weekday)
+                    + timedelta(hours=self.end.hour, minutes=self.end.minute)
+                )
+                event.add("summary", self.name)
+                event.add("dtstart", start_time)
+                event.add("dtend", end_time)
+                event.add("location", self.place)
                 ical.add_component(event)

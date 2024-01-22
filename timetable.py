@@ -9,11 +9,19 @@ from course import configparser
 from course import datetime, timedelta
 from icalendar import Calendar
 from urllib.parse import quote
+from visualization import view_timetable, view_next_class
 
 config = configparser.ConfigParser()
 config.read("config.ini")
 SEMESTER_START = datetime.strptime(config["database"]["weekone"], "%Y-%m-%d")
 SEMESTER_END = SEMESTER_START + timedelta(weeks=20)
+
+
+def date_range(start_date, end_date):
+    current_date = start_date
+    while current_date <= end_date:
+        yield current_date
+        current_date += timedelta(days=1)
 
 
 class Timetable:
@@ -53,70 +61,35 @@ class Timetable:
     def course_in_day(self, week: int, day: int) -> list[Course]:
         return [c for c in self.course_in_week(week) if c.weekday == day]
 
-    def find_one_day(self, string: str) -> None:
-        pre_lst = re.split(r"[-./ ]", string)
-        lst = [int(item) if item.isdigit() else -1 for item in pre_lst]
-        year = int(datetime.now().year)
-        if len(lst) == 3 or len(lst) == 2:
-            year = lst[0] if len(lst) == 3 else year
-            if year > 2100 or year < 1900:
-                print("\033[31m格式错误!\033[0m")
-                return
-            month = lst[1] if len(lst) == 3 else lst[0]
-            day = lst[2] if len(lst) == 3 else lst[1]
-            if month < 1 or month > 12:
-                print("\033[31m格式错误!\033[0m")
-                return
-            else:
-                if (
-                    (month == 2 and (day < 1 or day > 29))
-                    or ((month in [4, 6, 9, 11]) and (day < 1 or day > 30))
-                    or (day < 1 or day > 31)
-                ):
-                    print("\033[31m格式错误!\033[0m")
-                    return
-            date = datetime(year, month, day)
-            if date > SEMESTER_END or date < SEMESTER_START:
-                print(f"\033[93m{year}年{month}月{day}日的课表🚀\033[0m")
-                print("这一天不在这学期!")
-                return
-            this_delta = date - SEMESTER_START
-            this_week = this_delta.days // 7 + 1
-            this_weekday = date.weekday()
-            course_list = self.course_in_day(this_week, this_weekday)
-            if course_list:
-                weekday_lst = ["一", "二", "三", "四", "五", "六", "日"]
-                course_list.sort(key=lambda x: x.start)
-                print("\033[93m-------------------------------------\033[0m")
-                print(
-                    f"\033[93m{year}年{month}月{day}日的课表🚀 - 第{this_week}周 星期{weekday_lst[this_weekday]}\033[0m"
-                )
-                for c in course_list:
-                    print()
-                    start = c.start.strftime("%H:%M")
-                    end = c.end.strftime("%H:%M")
-                    print(f"\033[93m{start}~{end}\033[0m")
-                    c.view(time=False, week=False, day=False)
-                print("\033[93m-------------------------------------\033[0m")
-            else:
-                weekday_lst = ["一", "二", "三", "四", "五", "六", "日"]
-                print("\033[93m-------------------------------------\033[0m")
-                print(
-                    f"\033[93m{year}年{month}月{day}日的课表🚀 - 第{this_week}周 星期{weekday_lst[this_weekday]}\033[0m"
-                )
-                print("\033[33m\n            这一天没课🎉\n\033[0m")
-                print("\033[93m-------------------------------------\033[0m")
-        else:
+    def find_one_day(self, string: str, display: bool = True) -> list[Course]:
+        lst = [int(i) if i.isdigit() else -1 for i in re.split(r"[-./ ]", string)]
+        try:
+            date = (
+                datetime(lst[0], lst[1], lst[2])
+                if len(lst) == 3
+                else datetime(int(datetime.now().year), lst[0], lst[1])
+            )
+        except:
             print("\033[31m格式错误!\033[0m")
+            return None
+        if date > SEMESTER_END or date < SEMESTER_START:
+            if display:
+                print(f"\033[93m{date.year}年{date.month}月{date.day}日的课表🚀\033[0m")
+                print("这一天不在这学期!")
+            return None
+        this_week = (date - SEMESTER_START).days // 7 + 1
+        this_weekday = date.weekday()
+        course_list = self.course_in_day(this_week, this_weekday)
+        course_list.sort(key=lambda x: x.start)
+        if display:
+            view_timetable(
+                date.year, date.month, date.day, this_week, this_weekday, course_list
+            )
+        return course_list
 
     def today(self) -> None:
         date_str = datetime.now().strftime("%Y-%m-%d")
-        self.find_one_day(date_str)
-
-    def tomorrow(self) -> None:
-        date = datetime.now() + timedelta(days=1)
-        date_str = date.strftime("%Y-%m-%d")
-        self.find_one_day(date_str)
+        self.find_one_day(date_str, display=True)
 
     def next_class(self, date: datetime = datetime.now()) -> None:
         current_date = datetime.now()
@@ -126,6 +99,7 @@ class Timetable:
         today_class = self.course_in_day(current_week, current_weekday)
         today_class.sort(key=lambda x: x.start)
         is_today = False
+        class_day = datetime.now()
         next_class = None
         for i in range(len(today_class)):
             tmp = today_class[i].start.replace(
@@ -136,34 +110,19 @@ class Timetable:
                 is_today = True
                 break
         if not is_today:
-            if current_weekday == 6:
-                current_week += 1
-                current_weekday = 0
-            else:
-                current_weekday += 1
-            tomorrow_class = self.course_in_day(current_week, current_weekday)
-            if tomorrow_class:
-                min_index = 0
-                for i in range(len(tomorrow_class)):
-                    min_index = (
-                        i
-                        if tomorrow_class[i].start < tomorrow_class[min_index].start
-                        else min_index
-                    )
-                next_class = tomorrow_class[min_index]
+            course_list = []
+            for date in date_range(date + timedelta(days=1), SEMESTER_END):
+                course_list = self.find_one_day(
+                    date.strftime("%Y-%m-%d"), display=False
+                )
+                class_day = date
+                if course_list:
+                    break
+            next_class = course_list[0]
         if next_class:
-            print("\033[93m-------------------------------------\033[0m")
-            print("\033[93m下一节课🚀\033[0m")
-            next_class.view(time=False, week=False, day=False)
-            print("开始时间：今天", next_class.start.strftime("%H:%M")) if is_today else print(
-                "开始时间：明天", next_class.start.strftime("%H:%M")
-            )
-            print("结束时间：今天", next_class.end.strftime("%H:%M")) if is_today else print(
-                "结束时间：明天", next_class.end.strftime("%H:%M")
-            )
-            print("\033[93m-------------------------------------\033[0m")
+            view_next_class(next_class, class_day)
         else:
-            print("\033[93m今明两天都没有课, 好好休息吧!\033[0m")
+            print("\033[93m最近没有课, 好好休息!\033[0m")
 
     def detect_end(self, now):
         if now > SEMESTER_END or SEMESTER_START.weekday() != 0:
@@ -202,4 +161,4 @@ class Timetable:
         try:
             os.remove("Event.txt")
         except OSError as e:
-            print(f'删除文件时出错: {e}')
+            print(f"删除文件时出错: {e}")

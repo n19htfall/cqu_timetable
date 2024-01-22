@@ -34,9 +34,8 @@ def menu() -> str:
     print("1. 浏览课表")
     print("2. 最近的课")
     print("3. 今天的课")
-    print("4. 明天的课")
-    print("5. 查询某天的课")
-    print("6. 导出ics文件")
+    print("4. 查询某天的课")
+    print("5. 导出ics文件")
     print("q. 退出")
     print("\033[93m-------------------------------------\033[0m")
     choice = input("请输入：")
@@ -46,7 +45,7 @@ def menu() -> str:
 def browse() -> None:
     os.system("cls" if os.name == "nt" else "clear")
     now = datetime.now()
-    tt.find_one_day(now.strftime("%Y-%m-%d"))
+    tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
     while True:
         print("\033[93m-------------------------------------\033[0m")
         print("\033[93m浏览课表🚩\033[0m")
@@ -64,7 +63,7 @@ def browse() -> None:
             for ch in operation:
                 delta += {"h": -7, "j": -1, "k": 1, "l": 7}[ch]
             now += timedelta(days=delta)
-            tt.find_one_day(now.strftime("%Y-%m-%d"))
+            tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
         elif len(operation) > 1:
             if operation[:-1].isdigit() and operation[-1] in [
                 "h",
@@ -102,10 +101,8 @@ if __name__ == "__main__":
             elif menu_choice == "3":
                 tt.today()
             elif menu_choice == "4":
-                tt.tomorrow()
+                tt.find_one_day(input(f"请输入日期: "), display=True)
             elif menu_choice == "5":
-                tt.find_one_day(input(f"请输入日期: "))
-            elif menu_choice == "6":
                 tt.export_ics()
                 print("\033[93m导出成功!\033[0m")
             else:
