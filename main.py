@@ -64,6 +64,8 @@ def browse() -> None:
                 delta += {"h": -7, "j": -1, "k": 1, "l": 7}[ch]
             now += timedelta(days=delta)
             tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
+        elif len(operation) == 0:
+            tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
         elif len(operation) > 1:
             if operation[:-1].isdigit() and operation[-1] in [
                 "h",
