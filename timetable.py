@@ -60,11 +60,10 @@ class Timetable:
 
     def course_in_day(self, week: int, day: int) -> list[Course]:
         return [c for c in self.course_in_week(week) if c.weekday == day]
-
-    def find_one_day(self, string: str, display: bool = True) -> list[Course]:
+    
+    def str_to_date(self, string: str) -> datetime:
         lst = [int(i) if i.isdigit() else -1 for i in re.split(r"[-./ ]", string)]
         if len(lst) != 2 and len(lst) != 3:
-            print("\033[31m格式错误!\033[0m")
             return None
         try:
             date = (
@@ -73,12 +72,20 @@ class Timetable:
                 else datetime(int(datetime.now().year), lst[0], lst[1])
             )
         except:
-            print("\033[31m格式错误!\033[0m")
+            return None
+        return date
+
+    def find_one_day(self, string: str, display: bool = True) -> list[Course]:
+        date = self.str_to_date(string)
+        if date is None:
+            print("\033[31m输入错误!\033[0m")
             return None
         if date > SEMESTER_END or date < SEMESTER_START:
             if display:
+                print("\033[93m-------------------------------------\033[0m")
                 print(f"\033[93m{date.year}年{date.month}月{date.day}日的课表🚀\033[0m")
                 print("这一天不在这学期!")
+                print("\033[93m-------------------------------------\033[0m")
             return None
         this_week = (date - SEMESTER_START).days // 7 + 1
         this_weekday = date.weekday()

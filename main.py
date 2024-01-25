@@ -49,46 +49,51 @@ def browse() -> None:
     while True:
         print("\033[93m-------------------------------------\033[0m")
         print("\033[93m浏览课表🚩\033[0m")
+        print("输入日期 或者")
         print("h: 上一周 j: 上一天 k: 下一天 l: 下一周 ~: 回到今天 q: 退出")
         operation = input("输入：")
-        match_rule = re.match(r"^[hjkl]+$", operation)
         os.system("cls" if os.name == "nt" else "clear")
-        if operation == "~":
-            now = datetime.now()
-            tt.find_one_day(now.strftime("%Y-%m-%d"))
-        elif operation == "q":
-            break
-        elif match_rule:
-            delta = 0
-            for ch in operation:
-                delta += {"h": -7, "j": -1, "k": 1, "l": 7}[ch]
-            now += timedelta(days=delta)
-            tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
-        elif len(operation) == 0:
-            tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
-        elif len(operation) > 1:
-            if operation[:-1].isdigit() and operation[-1] in [
-                "h",
-                "j",
-                "k",
-                "l",
-            ]:
-                delta = 1 if operation[-1] in ["j", "k"] else 7
-                now += timedelta(
-                    days=int(operation[:-1])
-                    * (
-                        delta
-                        if operation[-1] == "k" or operation[-1] == "l"
-                        else -delta
-                    )
-                )
+        if tt.str_to_date(operation) is not None:
+            tt.find_one_day(operation, display=True)
+            now = tt.str_to_date(operation)
+        else:
+            match_rule = re.match(r"^[hjkl]+$", operation)
+            if operation == "~":
+                now = datetime.now()
                 tt.find_one_day(now.strftime("%Y-%m-%d"))
+            elif operation == "q":
+                break
+            elif match_rule:
+                delta = 0
+                for ch in operation:
+                    delta += {"h": -7, "j": -1, "k": 1, "l": 7}[ch]
+                now += timedelta(days=delta)
+                tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
+            elif len(operation) == 0:
+                tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
+            elif len(operation) > 1:
+                if operation[:-1].isdigit() and operation[-1] in [
+                    "h",
+                    "j",
+                    "k",
+                    "l",
+                ]:
+                    delta = 1 if operation[-1] in ["j", "k"] else 7
+                    now += timedelta(
+                        days=int(operation[:-1])
+                        * (
+                            delta
+                            if operation[-1] == "k" or operation[-1] == "l"
+                            else -delta
+                        )
+                    )
+                    tt.find_one_day(now.strftime("%Y-%m-%d"))
+                else:
+                    tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
+                    print("\033[31m输入错误!\033[0m")
             else:
                 tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
                 print("\033[31m输入错误!\033[0m")
-        else:
-            tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
-            print("\033[31m输入错误!\033[0m")
 
 
 if __name__ == "__main__":
