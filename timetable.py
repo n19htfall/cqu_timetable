@@ -89,7 +89,7 @@ class Timetable:
 
     def today(self) -> None:
         date_str = datetime.now().strftime("%Y-%m-%d")
-        self.find_one_day(date_str, display=True)
+        self.find_one_day(date_str)
 
     def next_class(self, date: datetime = datetime.now()) -> None:
         current_date = datetime.now()

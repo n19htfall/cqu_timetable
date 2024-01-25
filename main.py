@@ -45,7 +45,7 @@ def menu() -> str:
 def browse() -> None:
     os.system("cls" if os.name == "nt" else "clear")
     now = datetime.now()
-    tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
+    tt.find_one_day(now.strftime("%Y-%m-%d"))
     while True:
         print("\033[93m-------------------------------------\033[0m")
         print("\033[93m浏览课表🚩\033[0m")
@@ -54,7 +54,7 @@ def browse() -> None:
         op = input("输入：")
         os.system("cls" if os.name == "nt" else "clear")
         if tt.str_to_date(op) is not None:
-            tt.find_one_day(op, display=True)
+            tt.find_one_day(op)
             now = tt.str_to_date(op)
         else:
             match_rule = re.match(r"^[hjkl]+$", op)
@@ -68,9 +68,9 @@ def browse() -> None:
                 for ch in op:
                     delta += {"h": -7, "j": -1, "k": 1, "l": 7}[ch]
                 now += timedelta(days=delta)
-                tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
+                tt.find_one_day(now.strftime("%Y-%m-%d"))
             elif len(op) == 0:
-                tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
+                tt.find_one_day(now.strftime("%Y-%m-%d"))
             elif len(op) > 1:
                 if op[:-1].isdigit() and op[-1] in ["h", "j", "k", "l"]:
                     delta = 1 if op[-1] in ["j", "k"] else 7
@@ -80,10 +80,10 @@ def browse() -> None:
                     )
                     tt.find_one_day(now.strftime("%Y-%m-%d"))
                 else:
-                    tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
+                    tt.find_one_day(now.strftime("%Y-%m-%d"))
                     print("\033[31m输入错误!\033[0m")
             else:
-                tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
+                tt.find_one_day(now.strftime("%Y-%m-%d"))
                 print("\033[31m输入错误!\033[0m")
 
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
             elif menu_choice == "3":
                 tt.today()
             elif menu_choice == "4":
-                tt.find_one_day(input(f"请输入日期: "), display=True)
+                tt.find_one_day(input(f"请输入日期: "))
             elif menu_choice == "5":
                 tt.export_ics()
                 print("\033[93m导出成功!\033[0m")
