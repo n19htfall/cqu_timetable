@@ -82,8 +82,10 @@ def browse() -> None:
                 )
                 tt.find_one_day(now.strftime("%Y-%m-%d"))
             else:
+                tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
                 print("\033[31m输入错误!\033[0m")
         else:
+            tt.find_one_day(now.strftime("%Y-%m-%d"), display=True)
             print("\033[31m输入错误!\033[0m")
 
 
