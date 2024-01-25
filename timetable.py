@@ -63,6 +63,9 @@ class Timetable:
 
     def find_one_day(self, string: str, display: bool = True) -> list[Course]:
         lst = [int(i) if i.isdigit() else -1 for i in re.split(r"[-./ ]", string)]
+        if len(lst) != 2 and len(lst) != 3:
+            print("\033[31m格式错误!\033[0m")
+            return None
         try:
             date = (
                 datetime(lst[0], lst[1], lst[2])
@@ -110,13 +113,12 @@ class Timetable:
                 is_today = True
                 break
         if not is_today:
-            course_list = []
             for date in date_range(date + timedelta(days=1), SEMESTER_END):
                 course_list = self.find_one_day(
                     date.strftime("%Y-%m-%d"), display=False
                 )
                 class_day = date
-                if course_list:
+                if course_list is not None:
                     break
             next_class = course_list[0]
         if next_class:
