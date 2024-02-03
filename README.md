@@ -28,7 +28,7 @@ Python实现的命令行查询CQU课表，自用小玩具。可以浏览课表�
 
 ### 配置文件
 
-配置文件是 `config.ini` ，里面只需要更改第2行 `weekone` 的值，它代表当前学期**第一周的周一日期**。请按照“xxxx-xx-xx”的格式输入。你可以在[校历-重庆大学本科教学信息网 (cqu.edu.cn)](http://jwc.cqu.edu.cn/xl.htm)查看到确切的时间。
+配置文件是 `config.ini` ，里面只需修改第2行 `weekone` 的值，它表示当前学期**第一周的周一日期**。请按照“xxxx-xx-xx”的格式输入。你可以在[校历-重庆大学本科教学信息网 (cqu.edu.cn)](http://jwc.cqu.edu.cn/xl.htm)查询具体时间。
 
 ### 导入iOS日历
 
@@ -40,4 +40,4 @@ iOS日历导入ics文件比较麻烦（需要给自己发邮件），所以提�
 
 3. 在iPhone上拷贝 `url.txt` 里面的所有内容，粘贴到Safari并打开链接。
 
-如果你是其他平台，比如Windows的Outlook，直接双击ics文件导入就可以了。
+如果你是其他平台，比如Windows的Outlook，直接双击ics文件导入即可。

@@ -2,7 +2,7 @@ import os
 import sys
 
 from course import datetime, timedelta
-from timetable import Timetable, re
+from timetable import Timetable, re, str_to_date
 
 
 def init() -> Timetable:
@@ -53,9 +53,9 @@ def browse() -> None:
         print("h: 上一周 j: 上一天 k: 下一天 l: 下一周 ~: 回到今天 q: 退出")
         op = input("输入：")
         os.system("cls" if os.name == "nt" else "clear")
-        if tt.str_to_date(op) is not None:
+        if str_to_date(op) is not None:
             tt.find_one_day(op)
-            now = tt.str_to_date(op)
+            now = str_to_date(op)
         else:
             match_rule = re.match(r"^[hjkl]+$", op)
             if op == "~":
@@ -72,7 +72,7 @@ def browse() -> None:
             elif len(op) == 0:
                 tt.find_one_day(now.strftime("%Y-%m-%d"))
             elif len(op) > 1:
-                if op[:-1].isdigit() and op[-1] in ["h", "j", "k", "l"]:
+                if op[:-1].rstrip().isdigit() and op[-1] in ["h", "j", "k", "l"]:
                     delta = 1 if op[-1] in ["j", "k"] else 7
                     now += timedelta(
                         days=int(op[:-1])

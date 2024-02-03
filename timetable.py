@@ -51,22 +51,8 @@ class Timetable:
     def course_in_day(self, week: int, day: int) -> list[Course]:
         return [c for c in self.course_in_week(week) if c.weekday == day]
 
-    def str_to_date(self, string: str) -> datetime:
-        lst = [int(i) if i.isdigit() else -1 for i in re.split(r"[-./ ]", string)]
-        if len(lst) != 2 and len(lst) != 3:
-            return None
-        try:
-            date = (
-                datetime(lst[0], lst[1], lst[2])
-                if len(lst) == 3
-                else datetime(int(datetime.now().year), lst[0], lst[1])
-            )
-        except:
-            return None
-        return date
-
     def find_one_day(self, string: str, display: bool = True) -> list[Course]:
-        date = self.str_to_date(string)
+        date = str_to_date(string)
         if date is None:
             print("\033[31m输入错误!\033[0m")
             return None
@@ -144,6 +130,19 @@ class Timetable:
         except OSError as e:
             print(f"删除文件时出错: {e}")
 
+def str_to_date(string: str) -> datetime:
+        lst = [int(i) if i.isdigit() else -1 for i in re.split(r"[-./ ]", string)]
+        if len(lst) != 2 and len(lst) != 3:
+            return None
+        try:
+            date = (
+                datetime(lst[0], lst[1], lst[2])
+                if len(lst) == 3
+                else datetime(int(datetime.now().year), lst[0], lst[1])
+            )
+        except:
+            return None
+        return date
 
 def get_semester_start() -> bool:
     print("请输入学期第一周的周一日期（格式：2024-02-26）：")
