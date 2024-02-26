@@ -16,7 +16,7 @@ def init() -> Timetable:
 def load_timetable(path="课表.xlsx") -> Timetable:
     if not os.path.exists(path):
         print("\033[31m课表读取失败! (输入“q”退出)\033[0m")
-        tt_path = input("请输入课表文件路径: ")
+        tt_path = input("课表文件路径: ")
         if tt_path == "q" or tt_path == "quit":
             sys.exit()
         if os.name == "nt":
@@ -32,13 +32,12 @@ def load_timetable(path="课表.xlsx") -> Timetable:
 def menu() -> str:
     print(f"\033[93mCQU Timetable " + datetime.now().strftime("%Y-%m-%d") + "\033[0m")
     print("1. 浏览课表")
-    print("2. 最近的课")
-    print("3. 今天的课")
-    print("4. 查询某天的课")
-    print("5. 导出ics文件")
+    print("2. 下一节课")
+    print("3. 查询某天的课")
+    print("4. 导出ics文件")
     print("q. 退出")
     print("\033[93m-------------------------------------\033[0m")
-    choice = input("请输入：")
+    choice = input("输入：")
     return choice
 
 
@@ -61,7 +60,7 @@ def browse() -> None:
             if op == "~":
                 now = datetime.now()
                 tt.find_one_day(now.strftime("%Y-%m-%d"))
-            elif op == "q":
+            elif op == "q" or op == "quit":
                 break
             elif match_rule:
                 delta = 0
@@ -88,8 +87,9 @@ def browse() -> None:
 
 
 if __name__ == "__main__":
-    tt = init()
+    os.system("cls" if os.name == "nt" else "clear")
     try:
+        tt = init()
         menu_choice = menu()
         while menu_choice != "q" and menu_choice != "quit":
             need_confirm = True
@@ -99,10 +99,8 @@ if __name__ == "__main__":
             elif menu_choice == "2":
                 tt.next_class()
             elif menu_choice == "3":
-                tt.today()
+                tt.find_one_day(input(f"请输入日期 (如2.26)\n"))
             elif menu_choice == "4":
-                tt.find_one_day(input(f"请输入日期: "))
-            elif menu_choice == "5":
                 tt.export_ics()
                 print("\033[93m导出成功!\033[0m")
             else:
