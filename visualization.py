@@ -40,9 +40,13 @@ def view_timetable(
     print("\033[93m-------------------------------------\033[0m")
 
 
-def view_next_class(course: Course, date: datetime):
+def view_next_class(course: Course, date: datetime, next_class_delta: int):
     print("\033[93m-------------------------------------\033[0m")
-    print("\033[93m下一节课🚀\033[0m")
+    (
+        print("\033下一节课🚀 今天\033[0m")
+        if next_class_delta == 0
+        else print(f"\033[93m下一节课🚀 {next_class_delta}天后\033[0m")
+    )
     view(course, display_time=False, display_week=False, display_day=False)
     print("开始时间：", date.strftime("%Y-%m-%d"), course.start.strftime("%H:%M"))
     print("\033[93m-------------------------------------\033[0m")

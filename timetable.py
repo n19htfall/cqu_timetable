@@ -87,6 +87,7 @@ class Timetable:
         is_today = False
         class_day = datetime.now()
         next_class = None
+        next_class_delta = 0
         for i in range(len(today_class)):
             tmp = today_class[i].start.replace(
                 year=date.year, month=date.month, day=date.day
@@ -104,15 +105,17 @@ class Timetable:
                     current_date += timedelta(days=1)
 
             for date in date_range(date + timedelta(days=1), SEMESTER_END):
+                next_class_delta += 1
                 course_list = self.find_one_day(
                     date.strftime("%Y-%m-%d"), display=False
                 )
                 class_day = date
                 if course_list is not None:
                     break
+
             next_class = course_list[0]
         if next_class:
-            view_next_class(next_class, class_day)
+            view_next_class(next_class, class_day, next_class_delta)
         else:
             print("\033[93m最近没有课, 好好休息!\033[0m")
 
@@ -130,19 +133,21 @@ class Timetable:
         except OSError as e:
             print(f"删除文件时出错: {e}")
 
+
 def str_to_date(string: str) -> datetime:
-        lst = [int(i) if i.isdigit() else -1 for i in re.split(r"[-./ ]", string)]
-        if len(lst) != 2 and len(lst) != 3:
-            return None
-        try:
-            date = (
-                datetime(lst[0], lst[1], lst[2])
-                if len(lst) == 3
-                else datetime(int(datetime.now().year), lst[0], lst[1])
-            )
-        except:
-            return None
-        return date
+    lst = [int(i) if i.isdigit() else -1 for i in re.split(r"[-./ ]", string)]
+    if len(lst) != 2 and len(lst) != 3:
+        return None
+    try:
+        date = (
+            datetime(lst[0], lst[1], lst[2])
+            if len(lst) == 3
+            else datetime(int(datetime.now().year), lst[0], lst[1])
+        )
+    except:
+        return None
+    return date
+
 
 def get_semester_start() -> bool:
     print("请输入学期第一周的周一日期（格式：2024-02-26）：")
