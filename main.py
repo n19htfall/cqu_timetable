@@ -93,7 +93,9 @@ if __name__ == "__main__":
         menu_choice = menu()
         while menu_choice != "q" and menu_choice != "quit":
             need_confirm = True
-            if menu_choice == "1":
+            if menu_choice == "":
+                need_confirm = False
+            elif menu_choice == "1":
                 browse()
                 need_confirm = False
             elif menu_choice == "2":
