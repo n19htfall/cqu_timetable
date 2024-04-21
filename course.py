@@ -26,25 +26,26 @@ class Course:
         """
         通过课程时间的描述获取上课的周数、星期几和第几节课。
         """
-        zhou = string.find("周")
-        if zhou == -1:
+        zhou_index = string.find("周")
+        qi_index = string.find("期")
+        if zhou_index == -1:
             return
-        qi = string.find("期")
-        week_range_str = string[:zhou]
-        if "," in week_range_str:
-            week_range_list = week_range_str.split(",")
-            for item in week_range_list:
-                self.week_range += self.append_start_end(item)
-        else:
-            self.week_range = self.append_start_end(week_range_str)
-        if qi == -1:
+        week_range_str = string[:zhou_index]
+        self.week_range = self.parse_range_string(week_range_str)
+        if qi_index == -1:
             self.is_all_week = True
         else:
-            self.weekday = {"一": 0, "二": 1, "三": 2, "四": 3, "五": 4, "六": 5, "日": 6}.get(
-                string[qi + 1], -1
-            )
-            class_range_str = string[qi + 2 : -1]
-            self.class_range = self.append_start_end(class_range_str)
+            self.weekday = {
+                "一": 0,
+                "二": 1,
+                "三": 2,
+                "四": 3,
+                "五": 4,
+                "六": 5,
+                "日": 6,
+            }.get(string[qi_index + 1], None)
+            class_range_str = string[qi_index + 2 : -1]
+            self.class_range = self.parse_range_string(class_range_str)
         if not self.is_all_week:
             start_class = self.class_range[0]
             end_class = self.class_range[-1]
@@ -55,33 +56,22 @@ class Course:
                 config["database"][str(end_class)], "%H:%M"
             ) + timedelta(minutes=int(config["database"]["duration"]))
 
-    def append_start_end(self, string: str) -> list[int]:
+    def parse_range_string(self, s: str) -> list[int]:
         """
-        获取一个字符串中'-'两边的数字作为遍历范围，使之成为一个列表。
+        获取一个字符串中的数字，使之成为一个列表，同时解析“-”两边范围。
 
         例如：
-        >>> self.append_start_end(stirng='XXXXX2-4XXX')
-        [2, 3, 4]
+        >>> self.append_start_end(stirng='1,2-4,5')
+        [1, 2, 3, 4, 5]
         """
-        lst = []
-        if "-" not in string and string.isdigit():
-            lst += [int(string)]
-        else:
-            splited_string = string.split(",")
-            for s in splited_string:
-                idx = s.find("-")
-                start = s[:idx]
-                end = s[idx + 1 :]
-                if start:
-                    if end.isdigit() and start.isdigit():
-                        start_i = int(start)
-                        end_i = int(end)
-                    else:
-                        return lst
-                    lst += [i for i in range(start_i, end_i + 1)]
-                else:
-                    lst += [int(end) if end.isdigit() else None]
-        return lst
+        result = []
+        for part in s.split(","):
+            if "-" in part:
+                start, end = map(int, part.split("-"))
+                result.extend(range(start, end + 1))
+            else:
+                result.append(int(part))
+        return result
 
     def create_event_in_ical(self, ical: Calendar, semester_start: datetime):
         if not self.is_all_week:

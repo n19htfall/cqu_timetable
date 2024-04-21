@@ -7,7 +7,7 @@ import sys
 
 from course import Course
 from course import configparser
-from course import datetime, timedelta
+from datetime import datetime, timedelta
 from icalendar import Calendar
 from urllib.parse import quote
 from visualization import view_timetable, view_next_class
