@@ -61,7 +61,7 @@ class Course:
         获取一个字符串中的数字，使之成为一个列表，同时解析“-”两边范围。
 
         例如：
-        >>> self.append_start_end(stirng='1,2-4,5')
+        >>> self.parse_range_string(stirng='1,2-4,5')
         [1, 2, 3, 4, 5]
         """
         result = []
