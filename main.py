@@ -3,7 +3,7 @@ import sys
 import re
 
 from datetime import datetime, timedelta
-from timetable import Timetable, str_to_date
+from timetable import Timetable, str_to_date, set_semester_start
 
 
 def init() -> Timetable:
@@ -30,14 +30,18 @@ def load_timetable(path="课表.xlsx") -> Timetable:
     return tt
 
 
-def menu() -> str:
+def menu(timetable: Timetable) -> str:
     print(f"\033[93mCQU Timetable " + datetime.now().strftime("%Y-%m-%d") + "\033[0m")
     print("1. 浏览课表")
     print("2. 下一节课")
     print("3. 查询某天的课")
     print("4. 导出ics文件")
-    print("q. 退出")
-    print("\033[93m-------------------------------------\033[0m")
+    print("5. 设置学期时间")
+    print("q. 退出\n")
+    print(
+        f"\033[93m时间：{timetable.get_semester_name()} {tt.get_semester_start_in_config()}开始"
+    )
+    print("-------------------------------------\033[0m")
     choice = input("输入：")
     return choice
 
@@ -90,7 +94,7 @@ def browse() -> None:
 if __name__ == "__main__":
     os.system("cls" if os.name == "nt" else "clear")
     tt = init()
-    menu_choice = menu()
+    menu_choice = menu(tt)
     while menu_choice != "q" and menu_choice != "quit":
         need_confirm = True
         if menu_choice == "":
@@ -105,9 +109,23 @@ if __name__ == "__main__":
         elif menu_choice == "4":
             tt.export_ics()
             print("\033[93m导出成功!\033[0m")
+        elif menu_choice == "5":
+            old_day = tt.get_semester_start_in_config()
+            os.system("cls" if os.name == "nt" else "clear")
+            print(f"\033[93m当前学期: \033[0m{tt.get_semester_name()}")
+            print(
+                f"\033[93m第一周的周一日期: \033[0m{tt.get_semester_start_in_config()}"
+            )
+            print("\033[93m-------------------------------------\033[0m")
+            set_semester_start()
+            new_day = tt.get_semester_start_in_config()
+            if old_day != new_day:
+                os.system("cls" if os.name == "nt" else "clear")
+                print("检测到时间改变，请重新启动。")
+                sys.exit()
         else:
             print("\033[31m输入错误!\033[0m")
         if need_confirm:
             _ = input("输入任意继续...")
         os.system("cls" if os.name == "nt" else "clear")
-        menu_choice = menu()
+        menu_choice = menu(tt)

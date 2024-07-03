@@ -12,6 +12,9 @@ from icalendar import Calendar
 from urllib.parse import quote
 from visualization import view_timetable, view_next_class
 
+config = configparser.ConfigParser()
+config.read("config.ini")
+
 
 class Timetable:
     def __init__(self, path: str) -> None:
@@ -133,6 +136,14 @@ class Timetable:
         except OSError as e:
             print(f"删除文件时出错: {e}")
 
+    def get_semester_start_in_config(self) -> str:
+        return config["database"]["weekone"]
+
+    def get_semester_name(self) -> str:
+        assert SEMESTER_START.month > 0 and SEMESTER_START.month <= 12
+        semester = "春" if SEMESTER_START.month <= 6 else "秋"
+        return f"{SEMESTER_START.year}年{semester}季学期"
+
 
 def str_to_date(string: str) -> datetime:
     lst = [int(i) if i.isdigit() else -1 for i in re.split(r"[-./ ]", string)]
@@ -149,20 +160,24 @@ def str_to_date(string: str) -> datetime:
     return date
 
 
-def get_semester_start() -> bool:
-    print("请输入学期第一周的周一日期（格式：2024-02-26）：")
-    date_str = input()
-    try:
-        new_day = datetime.strptime(date_str, "%Y-%m-%d")
-    except ValueError:
-        print("日期格式错误！")
-        get_semester_start()
-    if new_day.weekday() != 0:
-        print("输入的日期不是周一！")
-        get_semester_start()
-    config.set("database", "weekone", date_str)
-    with open("config.ini", "w") as configfile:
-        config.write(configfile)
+def set_semester_start():
+    while True:
+        print("请输入学期第一周的周一日期（格式：2024-09-02，输入q返回）：")
+        date_str = input()
+        if date_str == "q" or date_str == "quit":
+            break
+        try:
+            new_day = datetime.strptime(date_str, "%Y-%m-%d")
+        except ValueError:
+            print("日期格式错误！")
+            continue
+        if new_day.weekday() != 0:
+            print("输入的日期不是周一！")
+        else:
+            config.set("database", "weekone", date_str)
+            with open("config.ini", "w") as configfile:
+                config.write(configfile)
+            break
 
 
 def detect_end(now):
@@ -176,10 +191,10 @@ def detect_end(now):
                 new_day = datetime.strptime(date_str, "%Y-%m-%d")
             except ValueError:
                 print("日期格式错误！")
-                get_semester_start()
+                set_semester_start()
             if new_day.weekday() != 0:
                 print("输入的日期不是周一！")
-                get_semester_start()
+                set_semester_start()
             config.set("database", "weekone", date_str)
             with open("config.ini", "w") as configfile:
                 config.write(configfile)
@@ -187,18 +202,16 @@ def detect_end(now):
         elif choice == "N" or choice == "n":
             return False
         else:
-            get_semester_start()
+            set_semester_start()
     return False
 
 
-config = configparser.ConfigParser()
-config.read("config.ini")
 try:
     SEMESTER_START = datetime.strptime(config["database"]["weekone"], "%Y-%m-%d")
     SEMESTER_END = SEMESTER_START + timedelta(weeks=20, days=-1)
 except ValueError:
     print("学期开始时间格式错误！")
-    get_semester_start()
+    set_semester_start()
     os.system("cls" if os.name == "nt" else "clear")
-    os.system("python main.py")
+    print("检测到时间改变，请重新启动。")
     sys.exit()
