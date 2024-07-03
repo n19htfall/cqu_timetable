@@ -89,28 +89,25 @@ def browse() -> None:
 
 if __name__ == "__main__":
     os.system("cls" if os.name == "nt" else "clear")
-    try:
-        tt = init()
+    tt = init()
+    menu_choice = menu()
+    while menu_choice != "q" and menu_choice != "quit":
+        need_confirm = True
+        if menu_choice == "":
+            need_confirm = False
+        elif menu_choice == "1":
+            browse()
+            need_confirm = False
+        elif menu_choice == "2":
+            tt.next_class()
+        elif menu_choice == "3":
+            tt.find_one_day(input(f"请输入日期 (如2.26)\n"))
+        elif menu_choice == "4":
+            tt.export_ics()
+            print("\033[93m导出成功!\033[0m")
+        else:
+            print("\033[31m输入错误!\033[0m")
+        if need_confirm:
+            _ = input("输入任意继续...")
+        os.system("cls" if os.name == "nt" else "clear")
         menu_choice = menu()
-        while menu_choice != "q" and menu_choice != "quit":
-            need_confirm = True
-            if menu_choice == "":
-                need_confirm = False
-            elif menu_choice == "1":
-                browse()
-                need_confirm = False
-            elif menu_choice == "2":
-                tt.next_class()
-            elif menu_choice == "3":
-                tt.find_one_day(input(f"请输入日期 (如2.26)\n"))
-            elif menu_choice == "4":
-                tt.export_ics()
-                print("\033[93m导出成功!\033[0m")
-            else:
-                print("\033[31m输入错误!\033[0m")
-            if need_confirm:
-                _ = input("输入任意继续...")
-            os.system("cls" if os.name == "nt" else "clear")
-            menu_choice = menu()
-    except KeyboardInterrupt:
-        sys.exit()

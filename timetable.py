@@ -110,7 +110,7 @@ class Timetable:
                     date.strftime("%Y-%m-%d"), display=False
                 )
                 class_day = date
-                if course_list is not None:
+                if course_list:
                     break
 
             next_class = course_list[0]
