@@ -39,7 +39,7 @@ def menu(timetable: Timetable) -> str:
     print("5. 设置学期时间")
     print("q. 退出\n")
     print(
-        f"\033[93m时间：{timetable.get_semester_name()} {tt.get_semester_start_in_config()}开始"
+        f"\033[93m{timetable.get_semester_name()}: {tt.get_semester_start_in_config()}开始"
     )
     print("-------------------------------------\033[0m")
     choice = input("输入：")
@@ -62,7 +62,7 @@ def browse() -> None:
             now = str_to_date(op)
         else:
             match_rule = re.match(r"^[hjkl]+$", op)
-            if op == "~":
+            if op == "~" or op == ".":
                 now = datetime.now()
                 tt.find_one_day(now.strftime("%Y-%m-%d"))
             elif op == "q" or op == "quit":
