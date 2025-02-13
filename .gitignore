@@ -1,5 +1,6 @@
 __pycache__/
 venv/
-课表.xlsx
+*.xlsx
 CQUTimetable.ics
 url.txt
+test/

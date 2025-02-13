@@ -21,12 +21,6 @@ class Timetable:
         self.courses: list[Course] = []
         self.cal = Calendar()
         timetable_file = path
-        try:
-            with open(timetable_file):
-                pass
-        except FileNotFoundError:
-            print("\033[31m课表文件不存在!\033[0m")
-            return
         with warnings.catch_warnings(record=True):
             warnings.simplefilter("always")
             df = pd.read_excel(timetable_file, engine="openpyxl")
@@ -162,7 +156,7 @@ def str_to_date(string: str) -> datetime:
 
 def set_semester_start():
     while True:
-        print("请输入学期第一周的周一日期（格式：2024-09-02，输入q返回）：")
+        print("请输入第一周的周一日期（格式：2025-02-17，输入q返回）：")
         date_str = input()
         if date_str == "q" or date_str == "quit":
             break
@@ -185,7 +179,7 @@ def detect_end(now):
         print("检测到学期开始时间异常，是否更新学期开始时间？[Y/n]")
         choice = input()
         if choice == "Y" or choice == "y":
-            print("请输入学期第一周的周一日期（格式：2024-02-26）：")
+            print("请输入学期第一周的周一日期（格式：2025-02-17）：")
             date_str = input()
             try:
                 new_day = datetime.strptime(date_str, "%Y-%m-%d")

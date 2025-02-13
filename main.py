@@ -1,33 +1,95 @@
 import os
 import sys
 import re
+import pandas as pd
+import warnings
 
 from datetime import datetime, timedelta
 from timetable import Timetable, str_to_date, set_semester_start
+from pathlib import Path
+from typing import List
+
+
+def find_xlsx_files(root_dir=".") -> List[str]:
+    xlsx_files = []
+    root_path = Path(root_dir)
+    try:
+        for file_path in root_path.rglob("*.xlsx"):
+            xlsx_files.append(str(file_path.absolute()))
+    except PermissionError as e:
+        print(f"警告: 无法访问某些目录: {e}")
+    except Exception as e:
+        print(f"发生错误: {e}")
+    return xlsx_files
 
 
 def init() -> Timetable:
     tt = load_timetable()
-    if tt.courses == []:
+    if tt is None or tt.courses == []:
         print("\033[31m课表为空! 请确认课表配置。\033[0m")
         sys.exit()
     return tt
 
 
-def load_timetable(path="课表.xlsx") -> Timetable:
-    if not os.path.exists(path):
-        print("\033[31m课表读取失败! (输入“q”退出)\033[0m")
-        tt_path = input("课表文件路径: ")
-        if tt_path == "q" or tt_path == "quit":
-            sys.exit()
-        if os.name == "nt":
-            os.system('copy "' + tt_path + '" "课表.xlsx"')
-        else:
-            os.system("cp " + tt_path + " 课表.xlsx")
-        tt = load_timetable(tt_path)
+def read_excel_first_row(file_path):
+    try:
+        with warnings.catch_warnings(record=True):
+            warnings.simplefilter("always")
+            df = pd.read_excel(file_path)
+        headers = df.columns.tolist()
+        first_row = df.iloc[0].tolist()
+        first_row_with_headers = df.iloc[0].to_dict()
+        return {
+            "headers": headers,
+            "first_row": first_row,
+            "first_row_with_headers": first_row_with_headers,
+        }
+    except FileNotFoundError:
+        print(f"错误: 找不到文件 {file_path}")
+        return None
+    except Exception as e:
+        print(f"读取文件时发生错误: {e}")
+        return None
+
+
+def find_timetable_manually():
+    print("\033[31m课表读取失败! (输入“q”退出)\033[0m")
+    tt_path = input("课表文件路径: ")
+    if tt_path == "q" or tt_path == "quit":
+        sys.exit()
+    if os.name == "nt":
+        path = tt_path
+        if tt_path[0] == "&":
+            pattern = r"'(.*)'"
+            match = re.search(pattern, tt_path)
+            if match:
+                path = match.group(1)
+        elif tt_path[0] in ['"', "'"] and tt_path[-1] == tt_path[0]:
+            path = tt_path[1:-1]
+        os.system('copy "' + path + '" "timetable.xlsx"')
     else:
-        tt = Timetable(path)
-    return tt
+        os.system("cp " + tt_path + " timetable.xlsx")
+    return Timetable("timetable.xlsx")
+
+
+def load_timetable() -> Timetable:
+    if os.path.exists("timetable.xlsx"):
+        return Timetable("timetable.xlsx")
+    xlsx_files = find_xlsx_files()
+    if not xlsx_files:
+        return find_timetable_manually()
+    for f in xlsx_files:
+        res = read_excel_first_row(f)
+        if "课表" not in res["headers"] or res["first_row"] != [
+            "课程名称",
+            "教学班号",
+            "上课时间",
+            "上课地点",
+            "上课教师",
+        ]:
+            continue
+        return Timetable(f)
+    return find_timetable_manually()
 
 
 def menu(timetable: Timetable) -> str:
@@ -94,6 +156,7 @@ def browse() -> None:
 if __name__ == "__main__":
     os.system("cls" if os.name == "nt" else "clear")
     tt = init()
+    os.system("cls" if os.name == "nt" else "clear")
     menu_choice = menu(tt)
     while menu_choice != "q" and menu_choice != "quit":
         need_confirm = True
@@ -112,7 +175,7 @@ if __name__ == "__main__":
         elif menu_choice == "5":
             old_day = tt.get_semester_start_in_config()
             os.system("cls" if os.name == "nt" else "clear")
-            print(f"\033[93m当前学期: \033[0m{tt.get_semester_name()}")
+            print(f"\033[93m学期: \033[0m{tt.get_semester_name()}")
             print(
                 f"\033[93m第一周的周一日期: \033[0m{tt.get_semester_start_in_config()}"
             )
